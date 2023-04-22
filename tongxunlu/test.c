@@ -28,10 +28,10 @@ int main()
 		switch (input)
 		{
 		case Add:
-			if (contact.capacity == 0)
+			/*if (contact.capacity == 0)
 			{
 				Initcontact(&contact);
-			}
+			}*/
 			Addcontact(&contact);
 			break;
 		case Del:
@@ -53,6 +53,8 @@ int main()
 			DelAllcontact(&contact);
 			break;
 		case Exit:
+			/*在释放内存之前，先将当前的通讯录保存到文件中 */
+			Savecontact(&contact);
 			free(contact.information);
 			contact.information = NULL;
 			printf("退出通讯录\n");

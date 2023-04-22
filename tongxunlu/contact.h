@@ -17,6 +17,7 @@ typedef struct PepInfo
 	char tele[TeleSize];
 	char addr[AddrSize];
 }PepInfo;
+
 //¶¯Ì¬
 typedef struct Contact
 {
@@ -39,3 +40,5 @@ void Modifycontact(Contact*contact);
 void Printcontact(Contact*contact);
 void Sortcontact(Contact*contact);
 void DelAllcontact(Contact* contact);
+void Savecontact(Contact* contact);
+void Loadcontact(Contact* contact);

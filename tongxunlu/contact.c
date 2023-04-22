@@ -18,6 +18,8 @@ void Initcontact(Contact* contact)
 	contact->capacity = Info_Num;
 	memset(contact->information, 0, sizeof(PepInfo)*Info_Num);
 	printf("通讯录创建成功！\n");
+	/*初始化完成后加载文件中的通讯录*/
+	Loadcontact(contact);
 }
 //静态
 //void Initcontact(Contact* contact)
@@ -39,18 +41,16 @@ int FindByName(Contact*contact)
 	}
 	return -1;
 }
-//动态
-void Addcontact(Contact* contact)
+void Checkcapacity(Contact*contact)
 {
-	
 	if (contact->sz == contact->capacity)
 	{
-		PepInfo*tmp = NULL;
-		tmp=(PepInfo*)realloc(contact->information,(contact->capacity+2)*sizeof(PepInfo));
+		PepInfo* tmp = NULL;
+		tmp = (PepInfo*)realloc(contact->information, (contact->capacity + 2) * sizeof(PepInfo));
 		if (tmp != NULL)
 		{
 			contact->information = tmp;
-			memset(contact->information +contact->capacity , 0, sizeof(PepInfo) * Car_capicity);
+			memset(contact->information + contact->capacity, 0, sizeof(PepInfo) * Car_capicity);
 			contact->capacity += 2;
 			printf("扩容成功！\n");
 			tmp = NULL;
@@ -61,6 +61,12 @@ void Addcontact(Contact* contact)
 			return;
 		}
 	}
+}
+//动态
+
+void Addcontact(Contact* contact)
+{
+	Checkcapacity(contact);
 	printf("请输入要添加信息：\n");
 	scanf(" %s", &(contact->information[contact->sz].name));
 	scanf(" %d", &(contact->information[contact->sz].age));
@@ -68,6 +74,7 @@ void Addcontact(Contact* contact)
 	scanf(" %s", &(contact->information[contact->sz].tele));
 	scanf(" %s", &(contact->information[contact->sz].addr));
 	contact->sz++;
+	printf("添加成功！\n");
 }
 //静态
 //void Addcontact(Contact* contact)
@@ -95,6 +102,7 @@ void Delcontact(Contact* contact)
 			contact->information[i]=contact->information[i + 1];
 		}
 		contact->sz--;
+		printf("删除成功！\n");
 	}
 	else
 		printf("要删除的联系人不存在\n");
@@ -210,3 +218,42 @@ void DelAllcontact(Contact* contact)
 //		return;
 //	}
 //}
+void Savecontact(Contact* contact)
+{
+	/*打开文件*/
+	FILE* pf = fopen("contact.txt", "w");
+	if (pf == NULL)
+	{
+		perror("Savecontact::fopen");
+		return;
+	}
+	/*写数据*/
+	int i = 0;
+	for (i = 0; i < contact->sz; i++)
+	{
+		fwrite(&(contact->information[i]), sizeof(PepInfo), 1, pf);
+	}
+	/*关闭文件 */
+	fclose(pf);
+	pf = NULL;
+	return;
+}
+void Loadcontact(Contact* contact)
+{/*打开文件*/
+	FILE* pf = fopen("contact.txt", "r");
+	if (pf == NULL)
+	{
+		perror("Loadcontact::fopen");
+		return;
+	}
+	/*读文件*/
+	PepInfo tmp = { 0 };
+	while (fread(&tmp, sizeof(PepInfo), 1, pf))
+	{
+		Checkcapacity(contact);
+		contact->information[contact->sz] = tmp;
+		contact->sz++;
+	}
+	fclose(pf);
+	pf = NULL;
+}
